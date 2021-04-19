@@ -1,17 +1,51 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import ReactDom from 'react-dom';
+import SeasonDisplay from './SeasonDisplay';
+import Spinner from './Spinner';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+// const App = () => {
+//     window.navigator.geolocation.getCurrentPosition(
+//         position => console.log(position),
+//         err => console.log(err)
+//     );
+//     return <div>Hi there</div>
+// }
+class App extends React.Component {
+    state = {
+        lat: null,
+        errorMessage: '',
+    };
+
+    componentDidMount() {
+        window.navigator.geolocation.getCurrentPosition(
+            position => this.setState({ lat:position.coords.latitude }),
+            err => this.setState({errorMessage: "Sorry 😔 You denided to access your location !"})
+        );
+    }
+    renderContent() {
+        if(this.state.errorMessage && !this.state.lat) {
+            return <div className="block-location"> <div>{this.state.errorMessage}</div> </div>
+        }
+        if(!this.state.errorMessage && this.state.lat) {
+         return <SeasonDisplay lat={this.state.lat} />
+        }
+ 
+        return <Spinner message="Please accept location request..." />
+    }
+
+
+    render() {
+      return (
+          <div>
+              {this.renderContent()}
+          </div>
+      )
+
+    }
+}
+
+    ReactDom.render(
+    <App />,
+    document.querySelector('#root')
+)
